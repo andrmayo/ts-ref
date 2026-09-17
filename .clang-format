@@ -1,0 +1,17 @@
+BasedOnStyle: Google
+
+PointerAlignment: Left
+
+# Google's five include groups. Priority 1 is left free for the main header,
+# which clang-format pins itself via IncludeIsMainRegex.
+IncludeCategories:
+  - Regex:    '^<ext/.*\.h>'   # C system headers
+    Priority: 2
+  - Regex:    '^<.*\.h>'
+    Priority: 2
+  - Regex:    '^<.*'           # C++ standard library
+    Priority: 3
+  - Regex:    '^"ts_ref/'  # this project; must precede the catch-all
+    Priority: 5
+  - Regex:    '.*'             # other libraries
+    Priority: 4
