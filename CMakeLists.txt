@@ -48,6 +48,11 @@ target_compile_definitions(ts_ref_lib PRIVATE
 
 add_executable(ts_ref src/main.cc)
 
+# The CMake target keeps an underscore, to pair with ts_ref_lib and to stay a
+# plain identifier; the binary itself is hyphenated, which is the usual shape
+# for a command name and matches the project's own name.
+set_target_properties(ts_ref PROPERTIES OUTPUT_NAME ts-ref)
+
 target_include_directories(ts_ref_lib PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 
 target_link_libraries(ts_ref PRIVATE ts_ref_lib)

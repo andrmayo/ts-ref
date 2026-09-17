@@ -3,10 +3,18 @@
 .PHONY: build configure clean fetch-deps format format-check
 
 BUILD_DIR := build/
+# The built binary, and the convenience symlink to it left at the project root
+# so it can be run as ./ts-ref rather than ./build/ts-ref. A link rather than a
+# copy, so it always resolves to the most recent build; nothing is installed
+# outside the project.
+BINARY := ts-ref
 SOURCES := $(shell find src include tests -name '*.cc' -o -name '*.h')
+# Downloaded by fetch-deps, and so safe for clean to delete.
+FETCHED_DEPS := third_party/nlohmann
 
 build: configure
 	cmake --build $(BUILD_DIR)
+	@ln -sf $(BUILD_DIR)$(BINARY) $(BINARY)
 
 configure: fetch-deps
 	mkdir -p build
@@ -18,9 +26,15 @@ format:
 format-check:
 	clang-format --dry-run --Werror $(SOURCES)
 
+# Removes only what the build produced or downloaded. third_party/tree_sitter
+# is vendored source, not a fetched dependency -- deleting it silently breaks
+# external scanner compilation -- so it is named explicitly here rather than
+# swept up by a wildcard. abseil and RE2 are fetched by CMake into
+# $(BUILD_DIR)/_deps and go with it.
 clean:
 	@rm -rf $(BUILD_DIR)
-	@rm -rf third_party/*/
+	@rm -rf $(FETCHED_DEPS)
+	@rm -f $(BINARY)
 
 fetch-deps:
 	mkdir -p third_party/nlohmann
